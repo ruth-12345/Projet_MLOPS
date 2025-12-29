@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédiction Churn - Télécoms</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .result h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .churn-yes {
+            color: #e74c3c;
+        }
+        
+        .churn-no {
+            color: #27ae60;
+        }
+        
+        .error {
+            background: #fee;
+            border-left: 5px solid #e74c3c;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 Prédiction de Churn</h1>
+        <p class="subtitle">Système de prédiction de résiliation client - Télécoms</p>
+        
+        <form method="POST" action="/predict">
+            <div class="row">
+                <div class="form-group">
+                    <label for="tenure">Ancienneté (mois) *</label>
+                    <input type="number" id="tenure" name="tenure" min="0" max="100" required 
+                           value="{{ input_data.tenure if input_data else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="monthly_charges">Frais mensuels (€) *</label>
+                    <input type="number" id="monthly_charges" name="monthly_charges" 
+                           min="0" max="200" step="0.01" required
+                           value="{{ input_data.MonthlyCharges if input_data else '' }}">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="total_charges">Frais totaux (€) *</label>
+                    <input type="number" id="total_charges" name="total_charges" 
+                           min="0" max="10000" step="0.01" required
+                           value="{{ input_data.TotalCharges if input_data else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contract">Type de contrat *</label>
+                    <select id="contract" name="contract" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Month-to-month" {{ 'selected' if input_data and input_data.Contract == 'Month-to-month' else '' }}>Mensuel</option>
+                        <option value="One year" {{ 'selected' if input_data and input_data.Contract == 'One year' else '' }}>1 an</option>
+                        <option value="Two year" {{ 'selected' if input_data and input_data.Contract == 'Two year' else '' }}>2 ans</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="payment_method">Méthode de paiement *</label>
+                <select id="payment_method" name="payment_method" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Electronic check" {{ 'selected' if input_data and input_data.PaymentMethod == 'Electronic check' else '' }}>Chèque électronique</option>
+                    <option value="Mailed check" {{ 'selected' if input_data and input_data.PaymentMethod == 'Mailed check' else '' }}>Chèque postal</option>
+                    <option value="Bank transfer (automatic)" {{ 'selected' if input_data and input_data.PaymentMethod == 'Bank transfer (automatic)' else '' }}>Virement automatique</option>
+                    <option value="Credit card (automatic)" {{ 'selected' if input_data and input_data.PaymentMethod == 'Credit card (automatic)' else '' }}>Carte bancaire (automatique)</option>
+                </select>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="internet_service">Service Internet *</label>
+                    <select id="internet_service" name="internet_service" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="DSL" {{ 'selected' if input_data and input_data.InternetService == 'DSL' else '' }}>DSL</option>
+                        <option value="Fiber optic" {{ 'selected' if input_data and input_data.InternetService == 'Fiber optic' else '' }}>Fibre optique</option>
+                        <option value="No" {{ 'selected' if input_data and input_data.InternetService == 'No' else '' }}>Aucun</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="paperless_billing">Paperless Billing *</label>
+                    <select id="paperless_billing" name="paperless_billing" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Yes" {{ 'selected' if input_data and input_data.TechSupport == 'Yes' else '' }}>Oui</option>
+                        <option value="No" {{ 'selected' if input_data and input_data.TechSupport == 'No' else '' }}>Non</option>
+                        <option value="No internet service" {{ 'selected' if input_data and input_data.TechSupport == 'No internet service' else '' }}>Pas de service internet</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit"> Prédire le Churn</button>
+        </form>
+        
+        {% if prediction %}
+        <div class="result">
+            <h2> Résultats de la Prédiction</h2>
+            <div class="result-item">
+                <span class="result-label">Risque de Churn :</span>
+                <span class="result-value {{ 'churn-yes' if prediction.churn == 'Oui' else 'churn-no' }}">
+                    {{ prediction.churn }}
+                </span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Probabilité :</span>
+                <span class="result-value">{{ prediction.probabilite }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Niveau de Risque :</span>
+                <span class="result-value">{{ prediction.risque }}</span>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if error %}
+        <div class="error">
+            <strong> Erreur :</strong> {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
