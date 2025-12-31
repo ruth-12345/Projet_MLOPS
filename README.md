@@ -114,8 +114,6 @@ Le pipeline GitHub Actions s'exécute automatiquement sur chaque push et compren
 ### Services AWS utilisés
 
 - **EC2** : Hébergement de l'application
-- **ECR** : Registry Docker
-- **S3** : Stockage des modèles
 - **CloudWatch** : Monitoring
 
 ### Commandes de déploiement
@@ -136,7 +134,7 @@ Le dataset contient des informations sur les clients télécoms :
 - **Backend** : Flask, Python 3.11
 - **ML** : scikit-learn, pandas, numpy
 - **DevOps** : Docker, GitHub Actions
-- **Cloud** : AWS (EC2, ECR, S3)
+- **Cloud** : AWS (EC2)
 - **Tests** : pytest
 
 ## 📈 Métriques du Modèle
@@ -148,7 +146,7 @@ Le dataset contient des informations sur les clients télécoms :
 
 ## 👥 Auteur
 
-Votre Nom - Projet Tutoré MLOps/DevOps
+Votre Nom - devops-mlops-aws-student-project
 
 ## 📝 Licence
 
@@ -156,7 +154,9 @@ Ce projet est à usage éducatif uniquement.
 
 ## 🔗 Liens Utiles
 
-- [Documentation Flask](https://flask.palletsprojects.com/)
+- [Documentation Flask](https://places-sneeze-rvg.craft.me/0LjhmCAekzVH3Y)
 - [Documentation scikit-learn](https://scikit-learn.org/)
-- [AWS Learner Lab](https://aws.amazon.com/training/)
-- [GitHub Actions](https://docs.github.com/en/actions)
+- [AWS Learner Lab](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:)
+- [AWS Learner Lab][Le lien vers l'application fonctionnelle sur AWS](http://3.223.78.97:5000)
+- [Le lien vers l'application Flask fonctionnel en local](http://localhost:5000)
+- [GitHub Actions](https://github.com/ruth-12345/Projet_MLOPS)
